@@ -29,11 +29,17 @@ A console-based Snake Game implemented in C++. This project simulates the classi
 ---
 
 ## File Structure
-SnakeGame/
-├── snake.cpp   # Main game code
-├── Snake.h     # Header file for snake and game functions (if used)
-|── README.md   # Project documentation
-
+**Snake-Game/SnakeGame/**
+```bash 
+# Main game code
+    - snake.cpp 
+# sanke.exe will be formed upon compilation
+    - sanke.exe
+# Precise information about the Game:
+    - ReadMe.md
+# Previous high score will be maintained:
+    - highscore.txt        
+```
 - The Folder also has a snake.exe file present in .gitignore which is expected to be made by the user.
 
 
