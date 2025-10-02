@@ -110,7 +110,7 @@ class Board {
     Point food;
     const char FOOD = 'o';
     Point specialFood;
-    const char SPECIAL_FOOD = '*';
+    const char SPECIAL_FOOD = '#';
     bool specialFoodActive = false;
     int specialFoodFrameCounter = 0;  // counts frames to spawn every 10 sec
     int specialFoodDuration = 50;     // frames it stays on screen
@@ -274,7 +274,7 @@ public:
         system("cls");
         string title = "=== SNAKE GAME ===";
         string instr1 = "Use Arrow Keys or WASD to move the snake.";
-        string instr2 = "Eat food 'o' and special food '*' (+10 points)!";
+        string instr2 = "Eat food 'o' and special food '#' (+10 points)!";
         string instr3 = "High score is saved between games.";
         string instr4 = "Press any key to start...";
         gotoxy((consoleWidth - title.length()) / 2, consoleHeight / 2 - 4); setColor(14); cout << title;

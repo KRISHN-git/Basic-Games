@@ -2,6 +2,10 @@
 
 A console-based Snake Game implemented in C++. This project simulates the classic snake game where the player controls a snake to eat food, grow in size, and avoid collisions with itself. It includes normal and special food items, score tracking, and dynamic gameplay.
 
+**GamePlay Screenshot:**
+
+![Gameplay Screenshot](GamePlay.png)
+
 ---
 
 ## Table of Contents
