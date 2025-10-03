@@ -19,12 +19,17 @@ A console-based Snake Game implemented in C++. This project simulates the classi
 ---
 
 ## Features
-- Fully playable Snake Game in the console.
-- Arrow keys and WASD controls for snake movement.
-- Normal food increases score and snake length.
-- Special food appears periodically and temporarily and grants bonus points.
-- Real-time collision detection with itself.
-- Simple console-based graphics for easy compilation and execution.
+- Snake movement using **Arrow Keys** or **WASD**.
+
+- **Normal Food** ('o') adds +1 score, increases snake length.
+
+- **Special Food** ('#') appears every 10 seconds, blinks in colors, worth +10 score.
+
+- **Wrap-around screen:** Snake can move through one wall and appear on the opposite side.
+
+- Persistent **High Score** saved in a text file.
+
+- Start screen and end screen messages.
 
 ---
 
@@ -65,49 +70,50 @@ A console-based Snake Game implemented in C++. This project simulates the classi
     ./snake
 ```
 ---
-## How to Play
- 
-- Press any key to start the game.
+## Code Explanation
+**Key Components**
 
-- Use the arrow keys to move the snake:
+1. Point Structure:
 
-      - Up: ↑
-      - Down: ↓
-      - Left: ←
-      - Right: →
-- You can also use WASD keys to control the movement:
+    - Represents (x, y) coordinates on the console.
 
-      - Up: W
-      - Left: A
-      - Down: S
-      - Right: D
+2. Snake Class:
 
-      WASD are basically the letters in your keyboard.      
+    - Maintains the snake's body (array of Points), length, and direction.
 
-- Eat the normal food (o) to grow in length and increase your score.
+    - Handles movement, collision detection, food consumption, and growth.
 
-- Eat special food (#) when it appears for bonus points.
+3. Board Class:
 
-- Avoid colliding with the snake’s own body.
----
+    - Manages snake object, food spawning, rendering, score, and game logic.
 
-## Game Mechanics
-- Snake Movement: The snake moves continuously in the current direction.
+    - Handles special food mechanics (timed appearance, blinking).
 
-- Food Spawning:
+    - Loads/saves high score.
+
+4. Main Function:
+
+    - Initializes console screen size.
+
+    - Creates board instance, shows start screen, runs the game loop.
+
+    - Ends when snake collides with itself.
+
+## Workflow
+
+The game follows a continuous loop until the snake dies:
 ```
-  - Normal food appears randomly on the board
-  - Special food appears at every 10th second for a limited time
-```
-- Scoring System:
-```bash
-  - Normal food: +1 points
-  - Special food: +10 points (appears temporarily)
-```
-- Game Over:
-```
-    - Snake hits the wall
-    - Snake collides with itself
+1. Start / Input Handling → User presses keys to set direction.
+
+2. Update Snake Position → Snake head moves; body follows.
+
+3. Check Collision → Detects food, special food, or self-collision.
+
+4. Update Score & Grow Snake → If food eaten, increase score and length.
+
+5. Render Board & Snake → Draws updated state.
+
+6. Loop Back → Repeats until collision ends game.
 ```
 ---
 ## Dependencies
