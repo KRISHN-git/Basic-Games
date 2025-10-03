@@ -4,7 +4,7 @@ A console-based Snake Game implemented in C++. This project simulates the classi
 
 **GamePlay Screenshot:**
 
-![Gameplay Screenshot](GamePlay.png)
+![Gameplay Screenshot](Gameplay.png)
 
 ---
 
