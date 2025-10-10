@@ -324,9 +324,9 @@ public:
         system("cls");
         string title = "=== SNAKE GAME ===";
         string instr1 = "Use Arrow Keys or WASD to move.";
-        string instr2 = "Eat food 'o' and special food '#' (+10 points).";
+        string instr2 = "Eat food 'o' (+1 point) and special food '#' (+10 points).";
         string instr3 = "Press SPACE to Pause/Resume.";
-        string instr4 = "Press any key to start...";
+        string instr4 = "  !! Press any key to start !!";
         gotoxy((consoleWidth - title.length()) / 2, consoleHeight / 2 - 4);
         setColor(14); cout << title;
         gotoxy((consoleWidth - instr1.length()) / 2, consoleHeight / 2 - 2);
