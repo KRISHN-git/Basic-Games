@@ -3,7 +3,7 @@
 #include <windows.h>
 using namespace std;
 
-#define MAX_LENGTH 1000
+#define MAX_LENGTH 300
 
 // Directions
 const char DIR_UP = 'U';
@@ -65,7 +65,6 @@ public:
     // Move snake, return false if it collides with itself
     bool move(Point food, Point specialFood, bool specialFoodActive) {
         Point prevTail = body[length - 1];
-
         for (int i = length - 1; i > 0; i--) body[i] = body[i - 1];
 
         switch (direction) {
@@ -83,15 +82,20 @@ public:
 
         // Self-collision
         for (int i = 1; i < length; i++)
-            if (body[0].xCoord == body[i].xCoord && body[0].yCoord == body[i].yCoord) return false;
+            if (body[0].xCoord == body[i].xCoord && body[0].yCoord == body[i].yCoord)
+                return false;
 
         // Eats normal food
-        if (food.xCoord == body[0].xCoord && food.yCoord == body[0].yCoord)
+        if (food.xCoord == body[0].xCoord && food.yCoord == body[0].yCoord) {
+            Beep(1000, 150); // sound for food
             body[length++] = Point(prevTail.xCoord, prevTail.yCoord);
+        }
 
         // Eats special food
-        if (specialFoodActive && specialFood.xCoord == body[0].xCoord && specialFood.yCoord == body[0].yCoord)
+        if (specialFoodActive && specialFood.xCoord == body[0].xCoord && specialFood.yCoord == body[0].yCoord) {
+            Beep(1500, 200); // sound for special food
             body[length++] = Point(prevTail.xCoord, prevTail.yCoord);
+        }
 
         else {
             // Erase previous tail
@@ -112,13 +116,14 @@ class Board {
     Point specialFood;
     const char SPECIAL_FOOD = '#';
     bool specialFoodActive = false;
-    int specialFoodFrameCounter = 0;  // counts frames to spawn every 10 sec
-    int specialFoodDuration = 50;     // frames it stays on screen
+    int specialFoodFrameCounter = 0;
+    int specialFoodDuration = 50;
     int specialFoodColorIndex = 0;
-    vector<int> specialColors = {12, 13, 10, 11, 14}; // blinking colors
+    vector<int> specialColors = {12, 13, 10, 11, 14};
     bool blinkState = true;
     int score;
     int highScore;
+    bool paused = false;
 
 public:
     Board() {
@@ -187,18 +192,15 @@ public:
     }
 
     void drawSnakeAndFood() {
-        // Draw snake
         for (int i = 0; i < snake->getLength(); i++) {
             gotoxy(snake->body[i].xCoord, snake->body[i].yCoord);
             if (i == 0) setColor(10), cout << getHeadSymbol(snake->getDirection());
             else setColor(2), cout << SNAKE_BODY;
         }
 
-        // Normal food
         setColor(12);
         gotoxy(food.xCoord, food.yCoord); cout << FOOD;
 
-        // Special food blinking and color cycling
         if (specialFoodActive) {
             if (blinkState) {
                 setColor(specialColors[specialFoodColorIndex]);
@@ -214,16 +216,15 @@ public:
     }
 
     bool update() {
+        if (paused) return true;
         bool alive = snake->move(food, specialFood, specialFoodActive);
         if (!alive) return false;
 
-        // Normal food eaten
         if (food.xCoord == snake->body[0].xCoord && food.yCoord == snake->body[0].yCoord) {
             score++;
             spawnFood();
         }
 
-        // Special food eaten
         if (specialFoodActive && snake->body[0].xCoord == specialFood.xCoord &&
             snake->body[0].yCoord == specialFood.yCoord) {
             score += 10;
@@ -231,37 +232,86 @@ public:
             specialFoodFrameCounter = 0;
         }
 
-        // Spawn special food every 10 sec (100 frames)
         specialFoodFrameCounter++;
         if (!specialFoodActive && specialFoodFrameCounter >= 100) {
             spawnSpecialFood();
             specialFoodFrameCounter = 0;
         }
 
-        // Erase special food if duration ends
         if (specialFoodActive) {
             specialFoodDuration--;
             if (specialFoodDuration <= 0) {
                 gotoxy(specialFood.xCoord, specialFood.yCoord);
                 cout << " ";
                 specialFoodActive = false;
-                specialFoodDuration = 50; // reset duration
+                specialFoodDuration = 50;
             }
         }
 
         return true;
     }
 
+    void togglePause() {
+        paused = !paused;
+        if (paused) {
+            Beep(600, 100);
+            showPauseMenu();
+        } else {
+            Beep(800, 100);
+        }
+    }
+
+    void showPauseMenu() {
+        system("cls");
+        string title = "=== GAME PAUSED ===";
+        string opt1 = "[1] Resume";
+        string opt2 = "[2] Restart";
+        string opt3 = "[3] Exit";
+        gotoxy((consoleWidth - title.length()) / 2, consoleHeight / 2 - 2);
+        setColor(14); cout << title;
+        gotoxy((consoleWidth - opt1.length()) / 2, consoleHeight / 2); setColor(15); cout << opt1;
+        gotoxy((consoleWidth - opt2.length()) / 2, consoleHeight / 2 + 1); cout << opt2;
+        gotoxy((consoleWidth - opt3.length()) / 2, consoleHeight / 2 + 2); cout << opt3;
+
+        char ch = getch();
+        if (ch == '1') paused = false;
+        else if (ch == '2') {
+            Beep(700, 200);
+            restartGame();
+        }
+        else if (ch == '3') {
+            system("cls");
+            Beep(300, 400);
+            exit(0);
+        }
+        system("cls");
+        drawBorder();
+    }
+
+    void restartGame() {
+        delete snake;
+        snake = new Snake(10, 10);
+        score = 0;
+        specialFoodActive = false;
+        specialFoodFrameCounter = 0;
+        spawnFood();
+        paused = false;
+    }
+
     void getInput() {
         if (kbhit()) {
             int key = getch();
-            if (key == 224) { // arrow keys
+            if (key == 32) { // Space bar for pause/resume
+                togglePause();
+                return;
+            }
+            if (key == 224) {
                 key = getch();
                 if (key == 72) snake->changeDirection(DIR_UP);
                 else if (key == 80) snake->changeDirection(DIR_DOWN);
                 else if (key == 75) snake->changeDirection(DIR_LEFT);
                 else if (key == 77) snake->changeDirection(DIR_RIGHT);
-            } else { // WASD keys
+            } else {
                 if (key == 'w' || key == 'W') snake->changeDirection(DIR_UP);
                 else if (key == 'a' || key == 'A') snake->changeDirection(DIR_LEFT);
                 else if (key == 's' || key == 'S') snake->changeDirection(DIR_DOWN);
@@ -273,15 +323,20 @@ public:
     void startScreen() {
         system("cls");
         string title = "=== SNAKE GAME ===";
-        string instr1 = "Use Arrow Keys or WASD to move the snake.";
-        string instr2 = "Eat food 'o' and special food '#' (+10 points)!";
-        string instr3 = "High score is saved between games.";
+        string instr1 = "Use Arrow Keys or WASD to move.";
+        string instr2 = "Eat food 'o' and special food '#' (+10 points).";
+        string instr3 = "Press SPACE to Pause/Resume.";
         string instr4 = "Press any key to start...";
-        gotoxy((consoleWidth - title.length()) / 2, consoleHeight / 2 - 4); setColor(14); cout << title;
-        gotoxy((consoleWidth - instr1.length()) / 2, consoleHeight / 2 - 2); setColor(15); cout << instr1;
-        gotoxy((consoleWidth - instr2.length()) / 2, consoleHeight / 2 - 1); cout << instr2;
-        gotoxy((consoleWidth - instr3.length()) / 2, consoleHeight / 2); cout << instr3;
-        gotoxy((consoleWidth - instr4.length()) / 2, consoleHeight / 2 + 2); cout << instr4;
+        gotoxy((consoleWidth - title.length()) / 2, consoleHeight / 2 - 4);
+        setColor(14); cout << title;
+        gotoxy((consoleWidth - instr1.length()) / 2, consoleHeight / 2 - 2);
+        setColor(15); cout << instr1;
+        gotoxy((consoleWidth - instr2.length()) / 2, consoleHeight / 2 - 1);
+        cout << instr2;
+        gotoxy((consoleWidth - instr3.length()) / 2, consoleHeight / 2);
+        cout << instr3;
+        gotoxy((consoleWidth - instr4.length()) / 2, consoleHeight / 2 + 2);
+        cout << instr4;
         getch();
         system("cls");
     }
@@ -309,6 +364,7 @@ int main() {
         Sleep(SLEEP_TIME);
     }
 
+    Beep(300, 400);
     board->endGame();
     gotoxy(0, consoleHeight);
     cout << "\n\nGame Over!\nFinal Score: " << board->getScore() << "\n";
