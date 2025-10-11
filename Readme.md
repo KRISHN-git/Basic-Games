@@ -6,6 +6,8 @@ A console-based Snake Game implemented in C++. This project simulates the classi
 
 ![Gameplay Screenshot](game.png)
 
+* Open [Snake-Game](https://youtu.be/jsgPovIMpWI) video to see the gameplay.
+
 ---
 
 ## Table of Contents
